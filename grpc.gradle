@@ -1,0 +1,40 @@
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.21.7"
+    }
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.51.0"
+        }
+    }
+    generateProtoTasks {
+        ofSourceSet('main').each { task ->
+            task.builtins {
+                java {
+                    outputSubDir = 'proto_gen'
+                }
+            }
+            task.plugins {
+                grpc {
+                    outputSubDir = 'proto_gen'
+                }
+            }
+        }
+    }
+    generatedFilesBaseDir = "$projectDir/src/"
+}
+task cleanProtoGen {
+    doFirst {
+        delete("$projectDir/src/main/proto_gen")
+    }
+}
+
+// Optional
+idea {
+    module {
+        sourceDirs += file("/src/main/proto_gen")
+        generatedSourceDirs += file("/src/main/proto_gen")
+    }
+}
+
+clean.dependsOn cleanProtoGen
